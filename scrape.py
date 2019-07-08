@@ -7,7 +7,7 @@ import urllib.request
 
 def gather_links(url):
     try:
-        browser = webdriver.Chrome('/Users/constantine/Downloads/chromedriver')
+        browser = webdriver.Chrome('/Users/constantine/Downloads/chromedriver') #input here the path to your selenium webdriver
     except UnboundLocalError:
         print('Driver is not found')
     try:
