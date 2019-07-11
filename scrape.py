@@ -3,18 +3,15 @@ from bs4 import BeautifulSoup as bs
 import re
 import json
 import urllib.request
+import time
+
+users = ['apple', '1', '2', '3', '4']
 
 
-def gather_links(url):
-    try:
-        browser = webdriver.Chrome('/Users/constantine/Downloads/chromedriver') #input here the path to your selenium webdriver
-    except UnboundLocalError:
-        print('Driver is not found')
-    try:
-        urllib.request.urlopen('https://instagram.com', timeout=1)
-    except urllib.request.URLError:
-        print('Instagram is not available')
+def gather_links(url, browser):
+    start1 = time.time()
     browser.get(url)
+    print(time.time() - start1)
     links=[]
     source = browser.page_source
     data=bs(source, 'html.parser')
@@ -41,10 +38,15 @@ def get_information_about_post(posts_list):
             post_text = ''
         likes = parsed_string['graphql']['shortcode_media']['edge_media_preview_like']['count']
         id = parsed_string['graphql']['shortcode_media']['id']
+        try:
+            top_comment = parsed_string['graphql']['shortcode_media']['edge_media_to_parent_comment']['edges'][0]['node']['text']
+        except:
+            top_comment = ''
         result = {
             "description": post_text,
             "likes": likes,
-            "id": id
+            "id": id,
+            "top comment": top_comment
         }
         json_result = json.dumps(result)
         json_result = json.loads(json_result)
@@ -52,10 +54,17 @@ def get_information_about_post(posts_list):
 
 
 if __name__ == "__main__":
-    username = input("Input a username: ")
-    username = str(username)
-    url = 'https://www.instagram.com/' + username
-    gather_links(url)
+    try:
+        browser = webdriver.Chrome('/Users/constantine/Downloads/chromedriver')
+    except UnboundLocalError:
+        print('Driver is not found')
+    try:
+        urllib.request.urlopen('https://instagram.com', timeout=5)
+    except urllib.request.URLError:
+        print('Instagram is not available')
+    for user in users:
+        url = 'https://www.instagram.com/' + user
+        gather_links(url, browser)
 
 
 
